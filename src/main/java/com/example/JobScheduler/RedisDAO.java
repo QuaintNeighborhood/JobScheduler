@@ -7,6 +7,7 @@ import redis.clients.jedis.resps.Tuple;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -45,12 +46,32 @@ public class RedisDAO {
         for (final Tuple tuple : listOfJobsWithoutSpecs) {
             final String jobSpecs = jedis.hget(HASH_KEY, tuple.getElement());
             final Job job = Job.builder()
+                    .jobId(tuple.getElement())
                     .date((long) tuple.getScore())
                     .jobSpecs(jobSpecs)
                     .build();
             res.add(job);
         }
         return res;
+    }
+
+    public Job getOldestJob() {
+        final Optional<Tuple> tuple = jedis.zrangeByScoreWithScores(SORTED_SET_KEY, 0, Double.MAX_VALUE)
+                .stream()
+                .findFirst();
+        if (tuple.isEmpty()) {
+            return null;
+        }
+        final Tuple unboxTuple = tuple.get();
+        final String jobId = unboxTuple.getElement();
+        jedis.zrem(SORTED_SET_KEY, jobId);
+        final String jobSpecs = jedis.hget(HASH_KEY, jobId);
+        jedis.hdel(HASH_KEY, jobId);
+        return Job.builder()
+                .jobId(jobId)
+                .date((long) unboxTuple.getScore())
+                .jobSpecs(jobSpecs)
+                .build();
     }
 
     public boolean updateJob(
