@@ -9,13 +9,17 @@ public class PollingThread extends Thread {
     private final int maxRetries = 1;
     private final int pollingDelayMillis = 10000;
 
-    private final boolean stopRequested = false;
+    private boolean stopRequested = false;
     private int numRetriesAttempted = 0;
 
     private final JobRunner runner;
 
     public PollingThread(final JobRunner runner) {
         this.runner = runner;
+    }
+
+    public void requestStop() {
+        stopRequested = true;
     }
 
     @Override

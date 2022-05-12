@@ -27,10 +27,7 @@ public class JobSchedulerApplication {
 	}
 
 	public static void main(final String[] args) {
-		try (final ConfigurableApplicationContext ignored
-					 = SpringApplication.run(JobSchedulerApplication.class, args)) {
-			LOGGER.info("Starting job scheduler application");
-		}
+		SpringApplication.run(JobSchedulerApplication.class, args);
 	}
 
 	@PostMapping(

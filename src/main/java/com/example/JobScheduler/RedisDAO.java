@@ -59,7 +59,7 @@ public class RedisDAO {
         final Optional<Tuple> tuple = jedis.zrangeByScoreWithScores(SORTED_SET_KEY, 0, Double.MAX_VALUE)
                 .stream()
                 .findFirst();
-        if (tuple.isEmpty()) {
+        if (!tuple.isPresent()) {
             return null;
         }
         final Tuple unboxTuple = tuple.get();

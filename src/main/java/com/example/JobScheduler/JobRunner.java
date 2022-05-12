@@ -23,4 +23,14 @@ public class JobRunner {
             System.out.println(job);
         }
     }
+
+    public static void main(String[] args) {
+        final JobRunner runner = new JobRunner();
+        final PollingThread thread = new PollingThread(runner);
+        try {
+            thread.start();
+        } finally {
+            thread.requestStop();
+        }
+    }
 }
